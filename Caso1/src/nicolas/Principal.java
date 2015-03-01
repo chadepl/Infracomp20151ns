@@ -21,6 +21,18 @@ public class Principal {
 		System.out.println("El numero de clientes es: "+clientes);
 		System.out.println("El numero de consultas es: "+consultas);
 		
+		Buffer buffer=new Buffer(clientes,6);
+		
+		for(int i=0;i<servidores;i++){
+			Thread thread=new Thread(new Servidor(i, buffer));
+			thread.start();
+		}
+		
+		for(int i=0;i<clientes;i++){
+			Thread thread=new Thread(new Cliente(i, consultas, buffer));
+			thread.start(); 
+		}
+		
 	}
 	
 	
