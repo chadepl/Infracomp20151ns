@@ -1,4 +1,4 @@
-package Caso1;
+package nicolas;
 
 public class Principal {
 
