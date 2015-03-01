@@ -14,7 +14,6 @@ public class Cliente extends Thread{
 		
 	}
 	
-	
 	public void run(){
 		
 		for(int i=1; i<=numeroDeMensajesAEnviar; i++) {
@@ -23,6 +22,7 @@ public class Cliente extends Thread{
 			System.out.println("Se creo el nuevo mensaje ID: "+nuevoMensaje.getId()+" CONT: "+nuevoMensaje.getContenido());
 			buffer.depositar(nuevoMensaje);
 			System.out.println("Se editó el mensaje ID: "+nuevoMensaje.getId()+" CONT: "+nuevoMensaje.getContenido());
+			
 		}
 		
 		buffer.disminuirNumeroDeClientesRestantes();

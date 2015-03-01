@@ -11,17 +11,16 @@ public class Buffer {
 	private Integer numeroDeClientesRestantes;
 
 	public Buffer(int capacidad, int numeroDeClientesRestantes) {
+		
 		this.capacidad = capacidad;
 		this.numeroDeClientesRestantes = numeroDeClientesRestantes;
 		buffer = new ArrayList<Mensaje>();
+		
 	}
-
 
 	public Integer getNumeroDeClientesRestantes() {
 		return numeroDeClientesRestantes;
 	}
-
-
 
 	public void depositar(Mensaje mensaje) {
 
@@ -47,51 +46,41 @@ public class Buffer {
 			e.printStackTrace();
 		}
 
-
-
 	}
 
-	public void retirar() {
+	public synchronized void retirar() {
 
-		synchronized (this) {
-			while (buffer.size() == 0 && numeroDeClientesRestantes>0) {
-				try {
-					this.wait();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}
-		//System.out.println("Salio retirar");
-
-		//synchronized (this) {
-		Mensaje mensaje = new Mensaje("falso", 0);
-		//if (buffer.size()>0) {
-
-		synchronized (this) {
-			if (buffer.size()>0) {
-				mensaje = buffer.remove(0);
-				mensaje.incrementarValor();
-				capacidad++;
+		while (buffer.size() == 0 && numeroDeClientesRestantes>0) {
+			try {
+				this.wait();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 
-		synchronized (mensaje) {
-			mensaje.notify();
+		if (buffer.size()>0) {
+			
+			Mensaje mensaje = buffer.remove(0);
+			mensaje.incrementarValor();
+			capacidad++;
+			
+			synchronized (mensaje) {
+				mensaje.notify();
+			}
+			
 		}
-
-		//}
-		//}
 
 	}
 
 	public synchronized void disminuirNumeroDeClientesRestantes() {
 
 		numeroDeClientesRestantes--;
-		System.out.println("Termino: "+numeroDeClientesRestantes);
+		//System.out.println("Termino: "+numeroDeClientesRestantes);
 
-		this.notifyAll();
+		if (numeroDeClientesRestantes==0) {
+			this.notifyAll();
+		}
 
 	}
 

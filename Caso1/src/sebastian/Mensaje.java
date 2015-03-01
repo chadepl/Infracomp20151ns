@@ -16,7 +16,7 @@ public class Mensaje {
 		return contenido;
 	}
 
-	public void incrementarValor() {
+	public synchronized void incrementarValor() {
 		this.contenido++;
 		procesado=true;
 	}
@@ -33,9 +33,4 @@ public class Mensaje {
 		return procesado;
 	}
 	
-	
-	
-	
-	
-
 }
