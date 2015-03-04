@@ -1,4 +1,4 @@
-package sebastian;
+package caso1;
 
 public class Cliente extends Thread{
 	

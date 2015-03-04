@@ -1,4 +1,4 @@
-package sebastian;
+package caso1;
 
 import java.util.*;
 
