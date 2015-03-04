@@ -14,7 +14,7 @@ public class Principal {
 		servidores=0;
 		clientes=0;
 		consultas=0;
-		capacidad = 10;
+		capacidad =0;
 		
 		lectura("data/in");
 		
@@ -47,6 +47,7 @@ public class Principal {
 			servidores=Integer.parseInt(reader.readLine().split(":")[1]);
 			clientes=Integer.parseInt(reader.readLine().split(":")[1]);
 			consultas=Integer.parseInt(reader.readLine().split(":")[1]);
+			capacidad=Integer.parseInt(reader.readLine().split(":")[1]);
 			
 //			while((line = reader.readLine())!=null){
 //				System.out.println(line);
