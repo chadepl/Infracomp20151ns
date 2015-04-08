@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.security.KeyPair;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -30,6 +31,8 @@ public class Principal {
 	private static PrintStream p;
 	private static InputStream l;
 	private static BufferedReader r;
+	
+	private static CertificateManager cm;
 
 	private static boolean iniciarSesion() throws Exception {
 
@@ -55,7 +58,7 @@ public class Principal {
 	private static boolean authenticate() throws Exception{
 
 		p.println(CERCLNT);
-		X509Certificate clientCertificate = CertificateManager.generateX509Certificate();
+		X509Certificate clientCertificate = cm.generateX509Certificate();
 		byte[] clientCertificateBytes = clientCertificate.getEncoded();
 		s.getOutputStream().write(clientCertificateBytes);
 		s.getOutputStream().flush();
@@ -80,6 +83,26 @@ public class Principal {
 			System.out.println(serverCertificate);
 			
 			//Leo la linea de la llave que manda el servidor
+			byte[] inicio = new byte[5];
+			s.getInputStream().read(inicio, 0, 5);
+			String inicioString = new String(inicio);
+			inicioString=inicioString.split(":")[0];
+			System.out.println(inicioString);
+			
+			byte[] llave = new byte[256];
+			s.getInputStream().read(llave,6,250);
+			String llaveString = new String(llave);
+			System.out.println(llaveString);
+			
+			if(inicioString.equals(INIT)){
+				System.out.println("Me llego init");
+				//System.out.println(initllave[1]);
+				SecurityManager sm=new SecurityManager(cm.getKeyPair());
+				System.out.println("Llave: "+sm.getHexString(llave));
+				//sm.descifrar(cipheredText);
+			}
+			
+			//
 			byte[] mensaje = new byte[100];
 			s.getInputStream().read(mensaje, 0, 100);
 			CipherExtra cipher=new CipherExtra();
@@ -140,7 +163,7 @@ public class Principal {
 
 
 	public static void main(String[] args) {
-
+		cm=new CertificateManager();
 		System.out.println(noSecurity());
 
 	}

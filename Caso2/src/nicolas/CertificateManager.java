@@ -22,6 +22,10 @@ public class CertificateManager {
 
 	// La fecha de venciemiento en un año
 	private static Date validityEndDate = new Date(System.currentTimeMillis() + 365 * 24 * 60 * 60 * 1000);
+	
+	public CertificateManager() {
+		// TODO Auto-generated constructor stub
+	}
 
 	public static X509Certificate generateX509Certificate() throws Exception {
 
@@ -46,11 +50,12 @@ public class CertificateManager {
 
 	    X509Certificate cert = certGen.generate(keyPair.getPrivate(), "BC");
 	    
+	    
 	    return cert;
 
 	}
 
-	public KeyPair getKeiPair() {
+	public KeyPair getKeyPair() {
 		return keyPair;
 	}
 
