@@ -1,7 +1,5 @@
 package sebastian;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.sql.Date;
 
@@ -15,22 +13,13 @@ import org.bouncycastle.x509.X509V1CertificateGenerator;
 
 public class CertificateManager {
 
-	private static KeyPair keyPair;
-
 	//La fecha de ayer
 	private static Date validityBeginDate = new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000);
 
 	// La fecha de venciemiento en un año
 	private static Date validityEndDate = new Date(System.currentTimeMillis() + 365 * 24 * 60 * 60 * 1000);
 
-	public static X509Certificate generateX509Certificate() throws Exception {
-
-		// GENERATE THE PUBLIC/PRIVATE RSA KEY PAIR
-		Security.addProvider(new BouncyCastleProvider());
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BC");
-		keyPairGenerator.initialize(1024, new SecureRandom());
-
-		keyPair = keyPairGenerator.generateKeyPair();
+	public static X509Certificate generateX509Certificate(KeyPair keyPair) throws Exception {
 
 		// GENERATE THE X509 CERTIFICATE
 		X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
@@ -44,9 +33,14 @@ public class CertificateManager {
 		certGen.setPublicKey(keyPair.getPublic());
 		certGen.setSignatureAlgorithm("MD5WITHRSAENCRYPTION");
 
-		X509Certificate cert = certGen.generate(keyPair.getPrivate(), "BC");
+		return certGen.generate(keyPair.getPrivate(), "BC");
 
-		return cert;
+	}
+
+	public static void verifyX509Certificate(X509Certificate certificate) throws Exception {
+
+		PublicKey publicKey = certificate.getPublicKey();
+		certificate.verify(publicKey);
 
 	}
 

@@ -1,10 +1,14 @@
 package sebastian;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.security.KeyPair;
+import java.security.PublicKey;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -28,10 +32,12 @@ public class Principal {
 	private static int port;
 	private static Socket s;
 	private static PrintStream p;
-	private static InputStream l;
 	private static BufferedReader r;
+	private static KeyPair keyPair;
+	private static PublicKey serverPublicKey;
+	private static SecretKey secretKey;
 
-	private static boolean iniciarSesion() throws Exception {
+	private static boolean signIn() throws Exception {
 
 		s = new Socket(serverName, port);
 		p = new PrintStream(s.getOutputStream());
@@ -55,7 +61,10 @@ public class Principal {
 	private static boolean authenticate() throws Exception{
 
 		p.println(CERCLNT);
-		X509Certificate clientCertificate = CertificateManager.generateX509Certificate();
+
+		keyPair = SecurityManager.generateKeyPair();
+
+		X509Certificate clientCertificate = CertificateManager.generateX509Certificate(keyPair);
 		byte[] clientCertificateBytes = clientCertificate.getEncoded();
 		s.getOutputStream().write(clientCertificateBytes);
 		s.getOutputStream().flush();
@@ -74,15 +83,84 @@ public class Principal {
 			X509Certificate serverCertificate = (X509Certificate)certFactory.generateCertificate(in);
 			in.close();
 
-			String ln = r.readLine();
-			
-			return ln.equals(INIT);
+			CertificateManager.verifyX509Certificate(serverCertificate);
+
+			serverPublicKey = serverCertificate.getPublicKey();
+
+			String lns[] = r.readLine().split(":");
+
+			if(lns[0].equals(INIT)) {
+				storePrivateKey(lns[1]);
+				return true;
+			}
 		}
 		
 		return false;
 
 	}
 
+	private static void storePrivateKey(String ln) throws Exception {
+
+		byte[] encodedKeyBytes = SecurityManager.hexStringToByteArray(ln);
+		byte[] decryptedKeyBytes = SecurityManager.decrypt(encodedKeyBytes, keyPair.getPrivate(), "RSA");
+
+		secretKey = new SecretKeySpec(decryptedKeyBytes, "AES");
+
+	}
+
+	public static boolean withSecurity() {
+
+		port = 443;
+
+		try {
+			s = new Socket(serverName, port);
+			System.out.println("CONECTADO A: "+s.getRemoteSocketAddress());
+			p = new PrintStream(s.getOutputStream());
+			r = new BufferedReader(new InputStreamReader(s.getInputStream()));
+
+			p.println("HOLA");
+
+			if(signIn()) {
+
+				if(authenticate()) {
+
+					return reportPosition();
+
+				}
+			}
+
+			s.close();
+			return false;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return false;
+
+	}
+
+	private static boolean reportPosition() throws Exception{
+
+		String longitude = "-74.0641626";
+		String latitude = "4.6015086";
+		String fullPosition = latitude +","+ longitude;
+		byte[] fullPositionBytes = fullPosition.getBytes();
+		byte[] encryptedFullPosition = SecurityManager.encrypt(fullPositionBytes, secretKey, "AES/ECB/PKCS5Padding");
+		String encryptedFullPositionInHex = SecurityManager.getHexStringFromBytes(encryptedFullPosition);
+		p.println(ACT1+":"+encryptedFullPositionInHex);
+
+		byte[] hashBytes = SecurityManager.createHmac(fullPositionBytes, secretKey, "HMACMD5");
+		byte[] encryptedHashBytes = SecurityManager.encrypt(hashBytes, serverPublicKey, "RSA");
+		String encryptedHashInHex = SecurityManager.getHexStringFromBytes(encryptedHashBytes);
+		p.println(ACT2+":"+encryptedHashInHex);
+
+		String ln = r.readLine();
+
+		return ln.equals(RTA+":"+OK);
+
+
+	}
 
 
 	public static boolean noSecurity() {
@@ -97,7 +175,7 @@ public class Principal {
 
 			p.println("HOLA");
 
-			if(iniciarSesion()) {
+			if(signIn()) {
 
 				if(authenticate()) {
 
@@ -128,7 +206,7 @@ public class Principal {
 
 	public static void main(String[] args) {
 
-		System.out.println(noSecurity());
+		System.out.println(withSecurity());
 
 	}
 
