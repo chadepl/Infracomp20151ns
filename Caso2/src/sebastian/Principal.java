@@ -64,7 +64,12 @@ public class Principal {
 		s.getInputStream().read(cervtSrvBytes, 0, 8);
 		String certSrvString = new String(cervtSrvBytes);
 		
+		
+		
 		if(certSrvString.equals(CERTSRV+"\n")) {
+			
+			
+			//Obtengo el certificado del servidor 
 			
 			byte[] serverCertificateBytes = new byte[16478];
 			s.getInputStream().read(serverCertificateBytes, 0, 520);
@@ -72,6 +77,14 @@ public class Principal {
 			
 			InputStream in = new ByteArrayInputStream(serverCertificateBytes);
 			X509Certificate serverCertificate = (X509Certificate)certFactory.generateCertificate(in);
+			System.out.println(serverCertificate);
+			
+			//Leo la linea de la llave que manda el servidor
+			byte[] mensaje = new byte[100];
+			s.getInputStream().read(mensaje, 0, 100);
+			Cipher cipher=new Cipher();
+			//cipher.
+			System.out.println(mensaje);
 			in.close();
 			
 			String ln = r.readLine();
@@ -87,7 +100,7 @@ public class Principal {
 
 	public static boolean noSecurity() {
 
-		port=80;
+		port=443;
 
 		try {
 			s = new Socket(serverName, port);
