@@ -15,6 +15,8 @@ import org.bouncycastle.x509.X509V1CertificateGenerator;
 
 public class CertificateManager {
 
+	private static KeyPair keyPair;
+	
 	//La fecha de ayer
 	private static Date validityBeginDate = new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000);
 
@@ -28,7 +30,7 @@ public class CertificateManager {
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA", "BC");
 		keyPairGenerator.initialize(1024, new SecureRandom());
 
-		KeyPair keyPair = keyPairGenerator.generateKeyPair();
+		keyPair = keyPairGenerator.generateKeyPair();
 		
 		// GENERATE THE X509 CERTIFICATE
 	    X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
@@ -47,5 +49,12 @@ public class CertificateManager {
 	    return cert;
 
 	}
+
+	public KeyPair getKeiPair() {
+		return keyPair;
+	}
+
+	
+	
 	
 }
