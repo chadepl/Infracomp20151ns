@@ -2,14 +2,19 @@ package nicolas;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PublicKey;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class SecurityManager {
 	
 	private static final String ALGORITMO="RSA";
+	private static final String ALGORITMO_CIFRADO="AES";
 	
 	
 	private KeyPair keyPair;
@@ -19,19 +24,19 @@ public class SecurityManager {
 		this.keyPair=keyPair;
 	}
 	
-	public byte[] cifrar() {
+	public byte[] cifrar(String pwd, SecretKey llave) {
 		try {
 			
-			Cipher cipher = Cipher.getInstance(ALGORITMO);
-			BufferedReader stdIn = new BufferedReader(new InputStreamReader(
-					System.in));
-			String pwd = stdIn.readLine();
+			Cipher cipher = Cipher.getInstance(ALGORITMO_CIFRADO);
 			byte[] clearText = pwd.getBytes();
+			
 			String s1 = new String(clearText);
 			System.out.println("clave original: " + s1);
-			cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPublic());
+			
+			cipher.init(Cipher.ENCRYPT_MODE, llave);
 			long startTime = System.nanoTime();
 			byte[] cipheredText = cipher.doFinal(clearText);
+			
 			long endTime = System.nanoTime();
 			System.out.println("clave cifrada: " + cipheredText);
 			System.out.println("Tiempo asimetrico: " + (endTime - startTime));
@@ -42,17 +47,21 @@ public class SecurityManager {
 		}
 	}
 	
-	public void descifrar(byte[] cipheredText) {
+	public String descifrar(byte[] cipheredText) {
 		try {
 			Cipher cipher = Cipher.getInstance(ALGORITMO);
 			cipher.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
 			byte[] clearText = cipher.doFinal(cipheredText);
 			String s3 = new String(clearText);
 			System.out.println("clave original: " + s3);
+			return s3;
 		} catch (Exception e) {
 			System.out.println("Excepcion: " + e.getMessage());
+			return null;
 		}
 	}
+	
+
 	
 	 public static String getHexString(byte[] b) throws Exception {
 	        String result = "";

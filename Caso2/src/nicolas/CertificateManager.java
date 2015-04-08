@@ -12,6 +12,7 @@ import java.security.cert.X509Certificate;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.x509.X509V1CertificateGenerator;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
 
 public class CertificateManager {
 
@@ -37,7 +38,7 @@ public class CertificateManager {
 		keyPair = keyPairGenerator.generateKeyPair();
 		
 		// GENERATE THE X509 CERTIFICATE
-	    X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
+	    X509V3CertificateGenerator certGen = new X509V3CertificateGenerator();
 	    X500Principal dnName = new X500Principal("CN=Cliente");
 
 	    certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
