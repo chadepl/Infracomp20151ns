@@ -5,9 +5,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.security.Key;
 import java.security.KeyPair;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 
 
@@ -83,6 +87,7 @@ public class Principal {
 			System.out.println(serverCertificate);
 			
 			//Leo la linea de la llave que manda el servidor
+			
 			byte[] inicio = new byte[5];
 			s.getInputStream().read(inicio, 0, 5);
 			String inicioString = new String(inicio);
@@ -90,16 +95,20 @@ public class Principal {
 			System.out.println(inicioString);
 			
 			byte[] llave = new byte[256];
-			s.getInputStream().read(llave,6,250);
+			s.getInputStream().read(llave,0,256);
 			String llaveString = new String(llave);
 			System.out.println(llaveString);
 			
 			if(inicioString.equals(INIT)){
-				System.out.println("Me llego init");
 				//System.out.println(initllave[1]);
 				SecurityManager sm=new SecurityManager(cm.getKeyPair());
-				System.out.println("Llave: "+sm.getHexString(llave));
-				//sm.descifrar(cipheredText);
+				byte[] llaveTraducida=sm.hexStringToByteArray(new String(llave));
+				byte[] llaveSimetrica=sm.descifrar(llaveTraducida).getBytes();
+				System.out.println("Llave simetrica del servidor: "+llaveSimetrica);
+				SecretKey key = new SecretKeySpec(llaveSimetrica, "AES");
+				System.out.println("Llave: "+key+"Largo de llave: "+key);
+				byte[] textoCifrado=sm.cifrar("41 24.2028,2 10.4418", key);
+				System.out.println("Cifrado a mandar: "+textoCifrado);
 			}
 			
 			//
