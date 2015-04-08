@@ -1,9 +1,11 @@
 package sebastian;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 
@@ -66,6 +68,12 @@ public class Principal {
 			
 			byte[] serverCertificateBytes = new byte[16478];
 			s.getInputStream().read(serverCertificateBytes, 0, 520);
+			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+			
+			InputStream in = new ByteArrayInputStream(serverCertificateBytes);
+			X509Certificate serverCertificate = (X509Certificate)certFactory.generateCertificate(in);
+			in.close();
+			
 			String ln = r.readLine();
 			
 			return ln.equals(INIT);
