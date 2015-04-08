@@ -1,4 +1,4 @@
-package sebastian;
+package Principal;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,9 +16,10 @@ import org.bouncycastle.crypto.engines.RSAEngine;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.util.encoders.Base64;
+import sebastian.*;
 
 
-public class Cipher {
+public class CipherExtra {
 	
 	private KeyPair key;
 	private PrivateKey priv;
