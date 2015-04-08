@@ -66,14 +66,14 @@ public class Principal {
 		
 		if(certSrvString.equals(CERTSRV+"\n")) {
 			
-			byte[] serverCertificateBytes = new byte[16478];
+			byte[] serverCertificateBytes = new byte[520];
 			s.getInputStream().read(serverCertificateBytes, 0, 520);
 			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
 			
 			InputStream in = new ByteArrayInputStream(serverCertificateBytes);
 			X509Certificate serverCertificate = (X509Certificate)certFactory.generateCertificate(in);
 			in.close();
-			
+
 			String ln = r.readLine();
 			
 			return ln.equals(INIT);
