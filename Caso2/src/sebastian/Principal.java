@@ -72,13 +72,13 @@ public class Principal {
 		byte[] cervtSrvBytes = new byte[8];
 		s.getInputStream().read(cervtSrvBytes, 0, 8);
 		String certSrvString = new String(cervtSrvBytes);
-		
+
 		if(certSrvString.equals(CERTSRV+"\n")) {
-			
+
 			byte[] serverCertificateBytes = new byte[520];
 			s.getInputStream().read(serverCertificateBytes, 0, 520);
 			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-			
+
 			InputStream in = new ByteArrayInputStream(serverCertificateBytes);
 			X509Certificate serverCertificate = (X509Certificate)certFactory.generateCertificate(in);
 			in.close();
@@ -94,7 +94,7 @@ public class Principal {
 				return true;
 			}
 		}
-		
+
 		return false;
 
 	}
@@ -183,7 +183,7 @@ public class Principal {
 					p.println(ACT2);
 
 					String[] ln = r.readLine().split(":");
-					
+
 					s.close();
 					if(ln[0].equals(RTA) && ln[1].equals(OK)) {
 						return true;
@@ -191,14 +191,14 @@ public class Principal {
 
 				}
 			}
-			
+
 			s.close();
 			return false;
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return false;
 
 	}
