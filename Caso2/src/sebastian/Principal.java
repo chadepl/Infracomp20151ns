@@ -1,11 +1,7 @@
 package sebastian;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
 import java.security.KeyPair;
 import java.security.PublicKey;
@@ -28,7 +24,7 @@ public class Principal {
 	private static final String ACT2 = "ACT2";
 	private static final String RTA = "RTA";
 
-	private static String serverName = "localhost";
+	private static String serverName = "infracomp.virtual.uniandes.edu.co";
 	private static int port;
 	private static Socket s;
 	private static PrintStream p;
@@ -69,11 +65,9 @@ public class Principal {
 		s.getOutputStream().write(clientCertificateBytes);
 		s.getOutputStream().flush();
 
-		byte[] cervtSrvBytes = new byte[8];
-		s.getInputStream().read(cervtSrvBytes, 0, 8);
-		String certSrvString = new String(cervtSrvBytes);
+		String ln = r.readLine();
 
-		if(certSrvString.equals(CERTSRV+"\n")) {
+		if(ln.equals(CERTSRV)) {
 
 			byte[] serverCertificateBytes = new byte[520];
 			s.getInputStream().read(serverCertificateBytes, 0, 520);
@@ -129,7 +123,6 @@ public class Principal {
 				}
 			}
 
-			s.close();
 			return false;
 
 		} catch (Exception e) {
@@ -184,7 +177,6 @@ public class Principal {
 
 					String[] ln = r.readLine().split(":");
 
-					s.close();
 					if(ln[0].equals(RTA) && ln[1].equals(OK)) {
 						return true;
 					}
@@ -192,7 +184,6 @@ public class Principal {
 				}
 			}
 
-			s.close();
 			return false;
 
 		} catch (Exception e) {
@@ -207,6 +198,11 @@ public class Principal {
 	public static void main(String[] args) {
 
 		System.out.println(withSecurity());
+		try {
+			s.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
