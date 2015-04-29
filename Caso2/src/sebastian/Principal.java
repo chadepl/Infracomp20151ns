@@ -24,7 +24,7 @@ public class Principal {
 	private static final String ACT2 = "ACT2";
 	private static final String RTA = "RTA";
 
-	private static String serverName = "infracomp.virtual.uniandes.edu.co";
+	private static String serverName = "localhost";//private static String serverName = "infracomp.virtual.uniandes.edu.co";
 	private static int port;
 	private static Socket s;
 	private static PrintStream p;
@@ -104,7 +104,7 @@ public class Principal {
 
 	public static boolean withSecurity() {
 
-		port = 443;
+		port = 1024;
 
 		try {
 			s = new Socket(serverName, port);

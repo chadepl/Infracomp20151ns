@@ -39,7 +39,7 @@ public class Servidor extends Thread {
 	/**
 	 * Puerto en el cual escucha el servidor.
 	 */
-	public static final int PUERTO = 443;
+	public static final int PUERTO = 1024;
 
 	/**
 	 * El socket que permite recibir requerimientos por parte de clientes.
