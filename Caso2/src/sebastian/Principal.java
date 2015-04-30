@@ -205,5 +205,15 @@ public class Principal {
 		}
 
 	}
+	
+	public Principal() {
+		
+		System.out.println(withSecurity());
+		try {
+			s.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 }
