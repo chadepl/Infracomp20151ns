@@ -35,6 +35,7 @@ public class Servidor extends Thread {
 	 * Constante que especifica el numero de threads que se usan en el pool de conexiones.
 	 */
 	public static final int N_THREADS = 6;
+	
 
 	/**
 	 * Puerto en el cual escucha el servidor.
