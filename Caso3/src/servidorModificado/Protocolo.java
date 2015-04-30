@@ -24,6 +24,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.security.cert.CertificateNotYetValidException;
 
+import Medidores.Medidor;
 import utils.Seguridad;
 import utils.Transformacion;
 
@@ -100,7 +101,7 @@ public class Protocolo {
 		if(SHOW_OUT)		System.out.println(">>SERV: " + msg);
 	}
 
-	public static void atenderCliente(Socket s){
+	public static void atenderCliente(Socket s,Medidor medidor){
 		try{
 			PrintWriter writer = new PrintWriter(s.getOutputStream(), true);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -153,6 +154,9 @@ public class Protocolo {
 			// Confirmando al cliente que los algoritmos son soportados.
 			write(writer, STATUS + SEPARADOR + OK);
 
+			//AQUI DEBE EMPEZAR LA MEDIDA DE TIEMPO DE RESPUESTA PARA ESTABLECER UNA LLAVE DE SESION
+			Long inicio=System.currentTimeMillis();
+			
 			// ////////////////////////////////////////////////////////////////////////
 			// Recibiendo el certificado del cliente
 			// ////////////////////////////////////////////////////////////////////////
@@ -192,6 +196,10 @@ public class Protocolo {
 			// Transforma la llave simertrica y la envia
 			write(writer, INIT + SEPARADOR + Transformacion.codificar(ciphertext1));
 
+			//AQUI DEBE EMPEZAR LA MEDIDA DE TIEMPO DE RESPUESTA PARA ESTABLECER UNA LLAVE DE SESION
+			Long fin=System.currentTimeMillis();
+			
+			medidor.tomarMedidaTiempo(1, inicio, fin);
 
 			// ////////////////////////////////////////////////////////////////////////
 			// Recibe la posicion del usuario.

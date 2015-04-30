@@ -10,6 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 
+import Medidores.Medidor;
 import servidor.Protocolo;
 
 
@@ -80,11 +81,12 @@ public class Servidor extends Thread {
 			
 			try {
 				Socket s = socket.accept();
+				Medidor medidor=new Medidor("TIEMPOS", 200, "Tabla de carga", 200, N_THREADS1);
 				s.setSoTimeout(TIME_OUT);
 				executor.execute(new Runnable() {
 					@Override
 					public void run() {
-						Protocolo.atenderCliente(s);
+						Protocolo.atenderCliente(s,medidor);
 					}
 				});
 				

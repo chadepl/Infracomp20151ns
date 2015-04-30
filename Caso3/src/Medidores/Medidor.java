@@ -39,6 +39,7 @@ public class Medidor {
 		threads=nThreads;
 		
 	}
+	
 
 	public void tomarMedidaTiempo(int id, Long tiempoInicial, Long tiempoFinal){
 		tiempos[id]=new MedidaTiempo(id, tiempoInicial, tiempoFinal);
@@ -109,4 +110,6 @@ public class Medidor {
 		}
 		
 	}
+	
+	
 }
