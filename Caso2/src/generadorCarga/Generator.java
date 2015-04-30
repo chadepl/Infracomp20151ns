@@ -5,13 +5,42 @@ import uniandes.gload.core.Task;
 
 public class Generator {
 
+	///////////////////
+	//ESCENARIO 1//////
+	///////////////////
+	private static final int NUM_TRANSACCIONES1=400;
+	private static final int GAP_TRANSACCION1=20;
+	
+	///////////////////
+	//ESCENARIO 2//////
+	///////////////////
+	private static final int NUM_TRANSACCIONES2=200;
+	private static final int GAP_TRANSACCION2=40;
+	
+	///////////////////
+	//ESCENARIO 3//////
+	///////////////////
+	private static final int NUM_TRANSACCIONES3=80;
+	private static final int GAP_TRANSACCION3=100;
 	
 	private LoadGenerator generator;
 	
-	public Generator(){
+	public Generator(int escenario){
+		
+		int numberOfTasks=0;
+		int gapBetweenTasks=0;
+		
+		if(escenario==1){
+			numberOfTasks=NUM_TRANSACCIONES1;
+			gapBetweenTasks=GAP_TRANSACCION1;
+		}else if(escenario==2){
+			numberOfTasks=NUM_TRANSACCIONES2;
+			gapBetweenTasks=GAP_TRANSACCION2;
+		}else if(escenario==3){
+			numberOfTasks=NUM_TRANSACCIONES3;
+			gapBetweenTasks=GAP_TRANSACCION3;
+		}
 		Task work=createTask();
-		int numberOfTasks=100;
-		int gapBetweenTasks=1000;
 		generator=new LoadGenerator("Client - Server load test", numberOfTasks, work, gapBetweenTasks);
 		generator.generate();
 	}
@@ -24,7 +53,7 @@ public class Generator {
 	
 	public static void main(String[] args) {
 		@SuppressWarnings("unused")
-		Generator generator=new Generator();
+		Generator generator=new Generator(1);
 	}
 	
 	

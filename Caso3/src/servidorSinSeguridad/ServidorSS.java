@@ -35,8 +35,6 @@ public class ServidorSS extends Thread {
 	/**
 	 * Constante que especifica el numero de threads que se usan en el pool de conexiones.
 	 */
-	public static final int N_THREADS = 6;
-
 	public static final int N_THREADS1=1;
 	public static final int N_THREADS2=2;
 	public static final int N_THREADS3=4;
@@ -74,7 +72,7 @@ public class ServidorSS extends Thread {
 		socket = new ServerSocket(PUERTO);
 		
 		//Se crea el executor que va a manejar y agregar a los threads al thread pool
-		ExecutorService executor=Executors.newFixedThreadPool(N_THREADS);
+		ExecutorService executor=Executors.newFixedThreadPool(N_THREADS1);
 		
 		while(true){
 			
