@@ -198,8 +198,8 @@ public class Protocolo {
 
 			//AQUI DEBE EMPEZAR LA MEDIDA DE TIEMPO DE RESPUESTA PARA ESTABLECER UNA LLAVE DE SESION
 			Long fin=System.currentTimeMillis();
-			
-			medidor.tomarMedidaTiempo(id, inicio, fin);
+			System.out.println("ID: "+id);
+			System.out.println("MEDIDA: "+medidor.tomarMedidaTiempo(id, inicio, fin));
 
 			// ////////////////////////////////////////////////////////////////////////
 			// Recibe la posicion del usuario.

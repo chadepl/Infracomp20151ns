@@ -33,7 +33,7 @@ public class Servidor extends Thread {
 	 */
 	private static final int TIME_OUT = 10000;
 	
-	private static final int MEDIDAS=400;
+	private static final int MEDIDAS=1;
 
 	/**
 	 * Constante que especifica el numero de threads que se usan en el pool de conexiones.
@@ -71,7 +71,7 @@ public class Servidor extends Thread {
 		
 		ExecutorService executor=Executors.newFixedThreadPool(N_THREADS1);
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-		Medidor medidor=new Medidor("TIEMPOS","Tabla de carga", 200, N_THREADS1);
+		Medidor medidor=new Medidor("TIEMPOS","Tabla de carga", MEDIDAS, N_THREADS1);
 		socket = new ServerSocket(PUERTO);
 		System.out.println("Recibiendo conexiones");
 		int medidasActuales=0;
@@ -95,7 +95,10 @@ public class Servidor extends Thread {
 			}
 		}
 		
-		medidor.exportarCSV(1);
+		if(MEDIDAS==medidasActuales){
+			medidor.exportarCSV(1);
+		}
+		
 
 		//executor.shutdown();
 		//while(!executor.isTerminated()){}

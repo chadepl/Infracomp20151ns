@@ -63,5 +63,10 @@ public class MedidaTiempo {
 		return tiempoTranscurrido+"";
 	}
 	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return id+" : "+tiempoInicial+" : "+tiempoInicial+" : "+tiempoTranscurrido;
+	}
 
 }

@@ -28,6 +28,7 @@ public class Medidor {
 		tipoMedidaTomando=tipo;
 		if(tipo.equals("TIEMPOS")){
 			tiempos=new MedidaTiempo[nCarga];
+			System.out.println("Largo de TIEMPOS: "+tiempos.length);
 		}else if(tipo.equals("TF")){
 			fallidas= new MedidaTF[nCarga];
 		}else{
@@ -41,8 +42,9 @@ public class Medidor {
 	}
 	
 
-	public void tomarMedidaTiempo(int id, Long tiempoInicial, Long tiempoFinal){
+	public MedidaTiempo tomarMedidaTiempo(int id, Long tiempoInicial, Long tiempoFinal){
 		tiempos[id]=new MedidaTiempo(id, tiempoInicial, tiempoFinal);
+		return tiempos[id];
 	}
 	
 	public void tomarMedidaTF(int id,int booleano){
@@ -57,13 +59,13 @@ public class Medidor {
 		
 		if(tipoMedidaTomando.equals("TIEMPOS")){
 			if(escenario>=1 && escenario<=12){
-				String ruta=rutaBase+"tiempos"+escenario+".csv";
+				outputFile=rutaBase+"tiempos"+escenario+".csv";
 			}else{
 				System.out.println("ERROR");
 			}
 		}else if(tipoMedidaTomando.equals("TF")){
 			if(escenario>=1 && escenario<=12){
-				String ruta=rutaBase+"transaccionesfallidas"+escenario+".csv";
+				outputFile=rutaBase+"transaccionesfallidas"+escenario+".csv";
 			}else{
 				System.out.println("ERROR");
 			}
@@ -77,17 +79,17 @@ public class Medidor {
 			CsvWriter csvOutput = new CsvWriter(new FileWriter(outputFile, true), ',');
 			
 			// if the file didn't already exist then we need to write out the header line
-			if (!alreadyExists)
-			{
-				csvOutput.write("id");
-				csvOutput.write("name");
-				csvOutput.endRecord();
-			}
+//			if (!alreadyExists)
+//			{
+//				csvOutput.write("id");
+//				csvOutput.write("name");
+//				csvOutput.endRecord();
+//			}
 			// else assume that the file already has the correct header line
 			
 			if(tipoMedidaTomando.equals("TIEMPOS")){
 				//Falta hacer el header del documento 
-				for(int i=0;i<tiempos.length;i++){
+				for(int i=0;i<carga-1;i++){
 					csvOutput.write(tiempos[i].getIdS());
 					csvOutput.write(tiempos[i].getTiempoInicialS());
 					csvOutput.write(tiempos[i].getTiempoFinalS());
