@@ -95,12 +95,123 @@ public class Principal {
 
 	}
 
+	private boolean authenticateNS() throws Exception{
+
+		p.println(CERCLNT);
+		tiempoInicioAutenticacion= System.currentTimeMillis();
+
+		keyPair = SecurityManager.generateKeyPair();
+
+		X509Certificate clientCertificate = CertificateManager.generateX509Certificate(keyPair);
+		byte[] clientCertificateBytes = clientCertificate.getEncoded();
+		s.getOutputStream().write(clientCertificateBytes);
+		s.getOutputStream().flush();
+
+		String ln = r.readLine();
+
+		if(ln.equals(CERTSRV)) {
+
+			byte[] serverCertificateBytes = new byte[520];
+			s.getInputStream().read(serverCertificateBytes, 0, 520);
+			CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
+
+			InputStream in = new ByteArrayInputStream(serverCertificateBytes);
+			X509Certificate serverCertificate = (X509Certificate)certFactory.generateCertificate(in);
+			in.close();
+
+			CertificateManager.verifyX509Certificate(serverCertificate);
+
+			serverPublicKey = serverCertificate.getPublicKey();
+
+			ln = r.readLine();
+			tiempoFinAutenticacion=System.currentTimeMillis();
+
+			if(ln.equals(INIT)) {
+				return true;
+			}
+		}
+
+		return false;
+
+	}
+
+
+
 	private void storePrivateKey(String ln) throws Exception {
 
 		byte[] encodedKeyBytes = SecurityManager.hexStringToByteArray(ln);
 		byte[] decryptedKeyBytes = SecurityManager.decrypt(encodedKeyBytes, keyPair.getPrivate(), "RSA");
 
 		secretKey = new SecretKeySpec(decryptedKeyBytes, "AES");
+
+	}
+
+
+	private boolean reportPosition() throws Exception{
+
+		String longitude = "-74.0641626";
+		String latitude = "4.6015086";
+		String fullPosition = latitude +","+ longitude;
+		byte[] fullPositionBytes = fullPosition.getBytes();
+		byte[] encryptedFullPosition = SecurityManager.encrypt(fullPositionBytes, secretKey, "AES/ECB/PKCS5Padding");
+		String encryptedFullPositionInHex = SecurityManager.getHexStringFromBytes(encryptedFullPosition);
+		p.println(ACT1+":"+encryptedFullPositionInHex);
+
+		byte[] hashBytes = SecurityManager.createHmac(fullPositionBytes, secretKey, "HMACMD5");
+		byte[] encryptedHashBytes = SecurityManager.encrypt(hashBytes, serverPublicKey, "RSA");
+		String encryptedHashInHex = SecurityManager.getHexStringFromBytes(encryptedHashBytes);
+		p.println(ACT2+":"+encryptedHashInHex);
+
+		String ln = r.readLine();
+		tiempoFin = System.currentTimeMillis();
+
+		return ln.equals(RTA+":"+OK);
+
+
+	}
+
+
+	public boolean noSecurity() {
+
+		port=1034;
+
+		try {
+			s = new Socket(serverName, port);
+			p = new PrintWriter(s.getOutputStream(), true);
+			r=new BufferedReader(new InputStreamReader(s.getInputStream()));
+
+			p.println("HOLA");
+			tiempoInicio=System.currentTimeMillis();
+
+			if(signIn()) {
+
+				if(authenticateNS()) {
+
+					p.println(ACT1);
+					p.println(ACT2);
+
+					String[] ln = r.readLine().split(":");
+					tiempoFin=System.currentTimeMillis();
+
+					if(ln[0].equals(RTA) && ln[1].equals(OK)) {
+						saveStatistics();
+						return true;
+					}
+
+				}
+			}
+
+			Generator.aumentarNumeroTransaccionesPerdidas();
+			return false;
+		}
+
+
+		catch (Exception e) {
+			Generator.aumentarNumeroTransaccionesPerdidas();
+			System.out.println(e.getMessage());
+		}
+
+		return false;
 
 	}
 
@@ -143,73 +254,6 @@ public class Principal {
 			} catch (IOException e) {
 				//e.printStackTrace();
 			}
-		}
-
-		return false;
-
-	}
-
-	private boolean reportPosition() throws Exception{
-
-		String longitude = "-74.0641626";
-		String latitude = "4.6015086";
-		String fullPosition = latitude +","+ longitude;
-		byte[] fullPositionBytes = fullPosition.getBytes();
-		byte[] encryptedFullPosition = SecurityManager.encrypt(fullPositionBytes, secretKey, "AES/ECB/PKCS5Padding");
-		String encryptedFullPositionInHex = SecurityManager.getHexStringFromBytes(encryptedFullPosition);
-		p.println(ACT1+":"+encryptedFullPositionInHex);
-
-		byte[] hashBytes = SecurityManager.createHmac(fullPositionBytes, secretKey, "HMACMD5");
-		byte[] encryptedHashBytes = SecurityManager.encrypt(hashBytes, serverPublicKey, "RSA");
-		String encryptedHashInHex = SecurityManager.getHexStringFromBytes(encryptedHashBytes);
-		p.println(ACT2+":"+encryptedHashInHex);
-
-		String ln = r.readLine();
-		tiempoFin = System.currentTimeMillis();
-
-		return ln.equals(RTA+":"+OK);
-
-
-	}
-
-
-	public boolean noSecurity() {
-
-		port=1024;
-
-		try {
-			s = new Socket(serverName, port);
-			System.out.println("CONECTADO A: "+s.getRemoteSocketAddress());
-			p = new PrintWriter(s.getOutputStream(), true);
-			r=new BufferedReader(new InputStreamReader(s.getInputStream()));
-
-			p.println("HOLA");
-
-			if(signIn()) {
-
-				if(authenticate()) {
-
-					p.println(ACT1);
-					p.println(ACT2);
-
-					String[] ln = r.readLine().split(":");
-
-					if(ln[0].equals(RTA) && ln[1].equals(OK)) {
-						saveStatistics();
-						return true;
-					}
-
-				}
-			}
-
-			Generator.aumentarNumeroTransaccionesPerdidas();
-			return false;
-		}
-
-
-		catch (Exception e) {
-			Generator.aumentarNumeroTransaccionesPerdidas();
-			System.out.println(e.getMessage());
 		}
 
 		return false;
