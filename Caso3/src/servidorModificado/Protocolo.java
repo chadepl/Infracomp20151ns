@@ -101,7 +101,7 @@ public class Protocolo {
 		if(SHOW_OUT)		System.out.println(">>SERV: " + msg);
 	}
 
-	public static void atenderCliente(Socket s,int id,Medidor medidor){
+	public static void atenderCliente(Socket s){
 		try{
 			PrintWriter writer = new PrintWriter(s.getOutputStream(), true);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -155,7 +155,7 @@ public class Protocolo {
 			write(writer, STATUS + SEPARADOR + OK);
 
 			//AQUI DEBE EMPEZAR LA MEDIDA DE TIEMPO DE RESPUESTA PARA ESTABLECER UNA LLAVE DE SESION
-			Long inicio=System.currentTimeMillis();
+			
 			
 			// ////////////////////////////////////////////////////////////////////////
 			// Recibiendo el certificado del cliente
@@ -196,10 +196,7 @@ public class Protocolo {
 			// Transforma la llave simertrica y la envia
 			write(writer, INIT + SEPARADOR + Transformacion.codificar(ciphertext1));
 
-			//AQUI DEBE EMPEZAR LA MEDIDA DE TIEMPO DE RESPUESTA PARA ESTABLECER UNA LLAVE DE SESION
-			Long fin=System.currentTimeMillis();
-			System.out.println("ID: "+id);
-			System.out.println("MEDIDA: "+medidor.tomarMedidaTiempo(id, inicio, fin));
+			
 
 			// ////////////////////////////////////////////////////////////////////////
 			// Recibe la posicion del usuario.

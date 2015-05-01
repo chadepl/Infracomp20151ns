@@ -47,7 +47,7 @@ public class Servidor extends Thread {
 	/**
 	 * Puerto en el cual escucha el servidor.
 	 */
-	public static final int PUERTO = 1024;
+	public static final int PUERTO = 8000;
 
 	/**
 	 * El socket que permite recibir requerimientos por parte de clientes.
@@ -71,46 +71,29 @@ public class Servidor extends Thread {
 		
 		ExecutorService executor=Executors.newFixedThreadPool(N_THREADS1);
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-		Medidor medidor=new Medidor("TIEMPOS","Tabla de carga", MEDIDAS, N_THREADS1);
 		socket = new ServerSocket(PUERTO);
-		System.out.println("Recibiendo conexiones");
-		int medidasActuales=0;
-		while(MEDIDAS!=medidasActuales){
+		int i=0;
+		while(MEDIDAS!=i){
 			try {
-				final int j=medidasActuales;
-				final Socket s = socket.accept();
+				Socket s = socket.accept();
 				s.setSoTimeout(TIME_OUT);
 				System.out.println("Se conecto");
 				Runnable run=new Runnable() {
-					@Override
 					public void run() {
-						Protocolo.atenderCliente(s,j,medidor);
+						Protocolo.atenderCliente(s);
 					}
 				};
 				executor.execute(run);
-				medidasActuales++;
+				i++;
 			} catch (IOException e) {
 				e.printStackTrace();
 				continue;
 			}
 		}
 		
-		boolean termino=false;
-		while(!termino){
-			for(int i=0;i<medidor.getTiempos().length;i++){
-				if(medidor.getTiempos()[i]==null){
-					continue;
-				}
-				termino=true;
-			}
-			//System.out.println("null");
-		}
-		
-		System.out.println(medidasActuales);
+	
 		
 		
-			medidor.exportarCSV(1);
-		System.out.println("Guardado");
 		
 
 		//executor.shutdown();
