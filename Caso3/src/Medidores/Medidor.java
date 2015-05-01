@@ -23,13 +23,13 @@ public class Medidor {
 	private int threads;
 	
 	//El titulo se refiere al titulo de la tabla 
-	public Medidor(String tipo,int cantidadMedidas,String nTitulo, int nCarga, int nThreads){
+	public Medidor(String tipo,String nTitulo, int nCarga, int nThreads){
 		
 		tipoMedidaTomando=tipo;
 		if(tipo.equals("TIEMPOS")){
-			tiempos=new MedidaTiempo[cantidadMedidas];
+			tiempos=new MedidaTiempo[nCarga];
 		}else if(tipo.equals("TF")){
-			fallidas= new MedidaTF[cantidadMedidas];
+			fallidas= new MedidaTF[nCarga];
 		}else{
 			System.out.println("ERROR");
 		}

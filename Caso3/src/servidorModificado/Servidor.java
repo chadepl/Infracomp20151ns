@@ -32,6 +32,8 @@ public class Servidor extends Thread {
 	 * por la respuesta de un cliente en cada una de las partes de la comunicación
 	 */
 	private static final int TIME_OUT = 10000;
+	
+	private static final int MEDIDAS=400;
 
 	/**
 	 * Constante que especifica el numero de threads que se usan en el pool de conexiones.
@@ -66,36 +68,34 @@ public class Servidor extends Thread {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		// Adiciona la libreria como un proveedor de seguridad.
-		// Necesario para crear llaves.
-		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());		
-
-		// Crea el socket que escucha en el puerto seleccionado.
-		socket = new ServerSocket(PUERTO);
 		
-		//Se crea el executor que va a manejar y agregar a los threads al thread pool
 		ExecutorService executor=Executors.newFixedThreadPool(N_THREADS1);
-		
-		while(true){
-			
-			
+		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+		Medidor medidor=new Medidor("TIEMPOS","Tabla de carga", 200, N_THREADS1);
+		socket = new ServerSocket(PUERTO);
+		System.out.println("Recibiendo conexiones");
+		int medidasActuales=0;
+		while(MEDIDAS!=medidasActuales){
 			try {
-				Socket s = socket.accept();
-				Medidor medidor=new Medidor("TIEMPOS", 200, "Tabla de carga", 200, N_THREADS1);
+				final int j=medidasActuales;
+				final Socket s = socket.accept();
 				s.setSoTimeout(TIME_OUT);
-				executor.execute(new Runnable() {
+				System.out.println("Se conecto");
+				Runnable run=new Runnable() {
 					@Override
 					public void run() {
-						Protocolo.atenderCliente(s,medidor);
+						Protocolo.atenderCliente(s,j,medidor);
 					}
-				});
-				
+				};
+				executor.execute(run);
+				medidasActuales++;
 			} catch (IOException e) {
 				e.printStackTrace();
 				continue;
-			} 
-			
+			}
 		}
+		
+		medidor.exportarCSV(1);
 
 		//executor.shutdown();
 		//while(!executor.isTerminated()){}

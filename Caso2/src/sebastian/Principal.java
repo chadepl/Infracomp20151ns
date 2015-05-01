@@ -158,7 +158,7 @@ public class Principal {
 
 	public static boolean noSecurity() {
 
-		port=80;
+		port=1024;
 
 		try {
 			s = new Socket(serverName, port);

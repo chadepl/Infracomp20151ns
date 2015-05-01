@@ -101,7 +101,7 @@ public class Protocolo {
 		if(SHOW_OUT)		System.out.println(">>SERV: " + msg);
 	}
 
-	public static void atenderCliente(Socket s,Medidor medidor){
+	public static void atenderCliente(Socket s,int id,Medidor medidor){
 		try{
 			PrintWriter writer = new PrintWriter(s.getOutputStream(), true);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
@@ -199,7 +199,7 @@ public class Protocolo {
 			//AQUI DEBE EMPEZAR LA MEDIDA DE TIEMPO DE RESPUESTA PARA ESTABLECER UNA LLAVE DE SESION
 			Long fin=System.currentTimeMillis();
 			
-			medidor.tomarMedidaTiempo(1, inicio, fin);
+			medidor.tomarMedidaTiempo(id, inicio, fin);
 
 			// ////////////////////////////////////////////////////////////////////////
 			// Recibe la posicion del usuario.
