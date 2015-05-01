@@ -1,10 +1,15 @@
 package sebastian;
+import com.sun.tools.javac.util.ClientCodeException;
+import generadorCarga.Generator;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.Socket;
 import java.security.KeyPair;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -26,14 +31,18 @@ public class Principal {
 
 	private static String serverName = "localhost";//private static String serverName = "infracomp.virtual.uniandes.edu.co";
 	private static int port;
-	private static Socket s;
-	private static PrintStream p;
-	private static BufferedReader r;
-	private static KeyPair keyPair;
-	private static PublicKey serverPublicKey;
-	private static SecretKey secretKey;
+	private Socket s;
+	private PrintWriter p;
+	private BufferedReader r;
+	private KeyPair keyPair;
+	private PublicKey serverPublicKey;
+	private SecretKey secretKey;
+	private long tiempoInicioAutenticacion;
+	private long tiempoFinAutenticacion;
+	private long tiempoInicio;
+	private long tiempoFin;
 
-	private static boolean signIn() throws Exception {
+	private boolean signIn() throws Exception {
 
 		String ln = r.readLine();
 		if(ln.equals(INICIO)) {
@@ -49,9 +58,10 @@ public class Principal {
 		return false;
 	}
 
-	private static boolean authenticate() throws Exception{
+	private boolean authenticate() throws Exception{
 
 		p.println(CERCLNT);
+		tiempoInicioAutenticacion= System.currentTimeMillis();
 
 		keyPair = SecurityManager.generateKeyPair();
 
@@ -88,7 +98,7 @@ public class Principal {
 
 	}
 
-	private static void storePrivateKey(String ln) throws Exception {
+	private void storePrivateKey(String ln) throws Exception {
 
 		byte[] encodedKeyBytes = SecurityManager.hexStringToByteArray(ln);
 		byte[] decryptedKeyBytes = SecurityManager.decrypt(encodedKeyBytes, keyPair.getPrivate(), "RSA");
@@ -97,23 +107,26 @@ public class Principal {
 
 	}
 
-	public static boolean withSecurity() {
+	public boolean withSecurity() {
 
 		port = 1024;
 
 		try {
 			s = new Socket(serverName, port);
-			System.out.println("CONECTADO A: "+s.getRemoteSocketAddress());
-			p = new PrintStream(s.getOutputStream());
+			p = new PrintWriter(s.getOutputStream(),true);
 			r = new BufferedReader(new InputStreamReader(s.getInputStream()));
 
 			p.println("HOLA");
+			tiempoInicio = System.currentTimeMillis();
 
 			if(signIn()) {
 
 				if(authenticate()) {
 
-					return reportPosition();
+					boolean reporto = reportPosition();
+					saveStatistics();
+					return reporto;
+
 
 				}
 			}
@@ -121,14 +134,25 @@ public class Principal {
 			return false;
 
 		} catch (Exception e) {
+
 			e.printStackTrace();
+		}
+
+		finally {
+			try {
+				if(s!=null){
+					s.close();
+				}
+			} catch (IOException e) {
+				//e.printStackTrace();
+			}
 		}
 
 		return false;
 
 	}
 
-	private static boolean reportPosition() throws Exception{
+	private boolean reportPosition() throws Exception{
 
 		String longitude = "-74.0641626";
 		String latitude = "4.6015086";
@@ -144,6 +168,7 @@ public class Principal {
 		p.println(ACT2+":"+encryptedHashInHex);
 
 		String ln = r.readLine();
+		tiempoFin = System.currentTimeMillis();
 
 		return ln.equals(RTA+":"+OK);
 
@@ -151,14 +176,14 @@ public class Principal {
 	}
 
 
-	public static boolean noSecurity() {
+	public boolean noSecurity() {
 
 		port=1024;
 
 		try {
 			s = new Socket(serverName, port);
 			System.out.println("CONECTADO A: "+s.getRemoteSocketAddress());
-			p = new PrintStream(s.getOutputStream());
+			p = new PrintWriter(s.getOutputStream(), true);
 			r=new BufferedReader(new InputStreamReader(s.getInputStream()));
 
 			p.println("HOLA");
@@ -173,42 +198,41 @@ public class Principal {
 					String[] ln = r.readLine().split(":");
 
 					if(ln[0].equals(RTA) && ln[1].equals(OK)) {
+						saveStatistics();
 						return true;
 					}
 
 				}
 			}
 
+			Generator.aumentarNumeroTransaccionesPerdidas();
 			return false;
+		}
 
-		} catch (Exception e) {
-			e.printStackTrace();
+
+		catch (Exception e) {
+			Generator.aumentarNumeroTransaccionesPerdidas();
+			System.out.println(e.getMessage());
 		}
 
 		return false;
 
 	}
 
+	private void saveStatistics() {
 
-	public static void main(String[] args) {
-
-		System.out.println(withSecurity());
-		try {
-			s.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Generator.guardarInformacion(tiempoFinAutenticacion-tiempoInicioAutenticacion, tiempoFin-tiempoInicio, this.toString());
 
 	}
-	
+
 	public Principal() {
-		
+
+		tiempoFin=0;
+		tiempoInicio=0;
+		tiempoInicioAutenticacion=0;
+		tiempoFinAutenticacion=0;
+
 		System.out.println(withSecurity());
-		try {
-			s.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 }

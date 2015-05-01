@@ -18,7 +18,7 @@ public class ClientServerTask extends Task{
 	@Override
 	public void execute() {
 		// TODO Auto-generated method stub
-		Principal.withSecurity();
+		Principal principal = new Principal();
 	}
 
 }
