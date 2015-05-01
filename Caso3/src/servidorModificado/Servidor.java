@@ -47,7 +47,7 @@ public class Servidor extends Thread {
 	/**
 	 * Puerto en el cual escucha el servidor.
 	 */
-	public static final int PUERTO = 8000;
+	public static final int PUERTO = 1024;
 
 	/**
 	 * El socket que permite recibir requerimientos por parte de clientes.
@@ -72,8 +72,8 @@ public class Servidor extends Thread {
 		ExecutorService executor=Executors.newFixedThreadPool(N_THREADS1);
 		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 		socket = new ServerSocket(PUERTO);
-		int i=0;
-		while(MEDIDAS!=i){
+
+		while(true){
 			try {
 				Socket s = socket.accept();
 				s.setSoTimeout(TIME_OUT);
@@ -84,7 +84,6 @@ public class Servidor extends Thread {
 					}
 				};
 				executor.execute(run);
-				i++;
 			} catch (IOException e) {
 				e.printStackTrace();
 				continue;
