@@ -8,7 +8,7 @@ public class Generator {
 	///////////////////
 	//ESCENARIO 1//////
 	///////////////////
-	private static final int NUM_TRANSACCIONES1=400;
+	private static final int NUM_TRANSACCIONES1=2;
 	private static final int GAP_TRANSACCION1=20;
 	
 	///////////////////
@@ -47,8 +47,8 @@ public class Generator {
 
 	private Task createTask() {
 		// TODO Auto-generated method stub
-		//return ClientServerTask;
-		return null;
+		return new ClientServerTask();
+		//return null;
 	}
 	
 	public static void main(String[] args) {

@@ -33,7 +33,7 @@ public class Servidor extends Thread {
 	 */
 	private static final int TIME_OUT = 10000;
 	
-	private static final int MEDIDAS=1;
+	private static final int MEDIDAS=2;
 
 	/**
 	 * Constante que especifica el numero de threads que se usan en el pool de conexiones.
@@ -95,9 +95,22 @@ public class Servidor extends Thread {
 			}
 		}
 		
-		if(MEDIDAS==medidasActuales){
-			medidor.exportarCSV(1);
+		boolean termino=false;
+		while(!termino){
+			for(int i=0;i<medidor.getTiempos().length;i++){
+				if(medidor.getTiempos()[i]==null){
+					continue;
+				}
+				termino=true;
+			}
+			//System.out.println("null");
 		}
+		
+		System.out.println(medidasActuales);
+		
+		
+			medidor.exportarCSV(1);
+		System.out.println("Guardado");
 		
 
 		//executor.shutdown();

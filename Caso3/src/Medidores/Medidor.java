@@ -42,7 +42,7 @@ public class Medidor {
 	}
 	
 
-	public MedidaTiempo tomarMedidaTiempo(int id, Long tiempoInicial, Long tiempoFinal){
+	public synchronized MedidaTiempo tomarMedidaTiempo(int id, Long tiempoInicial, Long tiempoFinal){
 		tiempos[id]=new MedidaTiempo(id, tiempoInicial, tiempoFinal);
 		return tiempos[id];
 	}
@@ -89,7 +89,7 @@ public class Medidor {
 			
 			if(tipoMedidaTomando.equals("TIEMPOS")){
 				//Falta hacer el header del documento 
-				for(int i=0;i<carga-1;i++){
+				for(int i=0;i<carga;i++){
 					csvOutput.write(tiempos[i].getIdS());
 					csvOutput.write(tiempos[i].getTiempoInicialS());
 					csvOutput.write(tiempos[i].getTiempoFinalS());
@@ -111,6 +111,16 @@ public class Medidor {
 			e.printStackTrace();
 		}
 		
+	}
+
+
+	public MedidaTiempo[] getTiempos() {
+		return tiempos;
+	}
+
+
+	public void setTiempos(MedidaTiempo[] tiempos) {
+		this.tiempos = tiempos;
 	}
 	
 	
