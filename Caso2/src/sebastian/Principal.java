@@ -87,6 +87,7 @@ public class Principal {
 			serverPublicKey = serverCertificate.getPublicKey();
 
 			String lns[] = r.readLine().split(":");
+			tiempoFinAutenticacion=System.currentTimeMillis();
 
 			if(lns[0].equals(INIT)) {
 				storePrivateKey(lns[1]);
