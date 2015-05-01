@@ -35,11 +35,6 @@ public class Principal {
 
 	private static boolean signIn() throws Exception {
 
-		s = new Socket(serverName, port);
-		p = new PrintStream(s.getOutputStream());
-		r = new BufferedReader(new InputStreamReader(s.getInputStream()));
-
-		p.println(HOLA);
 		String ln = r.readLine();
 		if(ln.equals(INICIO)) {
 
