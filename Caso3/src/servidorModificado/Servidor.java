@@ -33,7 +33,7 @@ public class Servidor extends Thread {
 	 */
 	private static final int TIME_OUT = 10000;
 	
-	private static final int MEDIDAS=2;
+	private static final int MEDIDAS=80;
 
 	/**
 	 * Constante que especifica el numero de threads que se usan en el pool de conexiones.
